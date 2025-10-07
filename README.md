@@ -273,6 +273,3 @@ curl -X POST http://localhost:5000/api/cover/send-to-shop \
 ### CORS errors?
 - Update CORS configuration in `server.js` to allow your frontend domain
 
-## License
-
-MIT
