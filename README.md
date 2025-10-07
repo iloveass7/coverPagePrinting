@@ -256,39 +256,6 @@ curl -X POST http://localhost:5000/api/cover/send-to-shop \
 - No sensitive data stored (stateless)
 - Environment variables for credentials
 
-## Frontend Integration
-
-Example fetch request from React:
-
-```javascript
-// Download PDF
-const downloadPDF = async (formData) => {
-  const response = await fetch('http://localhost:5000/api/cover/download/pdf', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(formData)
-  });
-  
-  const blob = await response.blob();
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `assignment_cover_${formData.studentId}.pdf`;
-  a.click();
-};
-
-// Send to shop
-const sendToShop = async (formData) => {
-  const response = await fetch('http://localhost:5000/api/cover/send-to-shop', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(formData)
-  });
-  
-  const result = await response.json();
-  console.log('Token:', result.token);
-};
-```
 
 ## Troubleshooting
 
