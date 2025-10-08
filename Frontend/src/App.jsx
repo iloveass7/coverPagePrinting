@@ -1,16 +1,18 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// Frontend/src/App.jsx
+import React from 'react';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="text-center text-3xl font-semibold text-green-600">
-        Welcome To Print Press with Tailwind CSS
-    </div>  
-  )
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <Home />
+      <Footer />
+    </div>
+  );
 }
 
-export default App
+export default App;

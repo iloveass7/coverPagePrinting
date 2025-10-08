@@ -1,1 +1,36 @@
-@import "tailwindcss"; 
+/* src/index.css */
+@import "tailwindcss";
+
+/* Add font faces AFTER importing tailwindcss */
+@font-face {
+  font-family: 'Pixelify Sans';
+  src: url('/fonts/PixelifySans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Pixelify Sans';
+  src: url('/fonts/PixelifySans-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Pixelify Sans';
+  src: url('/fonts/PixelifySans-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Pixelify Sans';
+  src: url('/fonts/PixelifySans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Configure theme AFTER @font-face */
+@theme {
+  --font-pixelify: "Pixelify Sans", cursive, sans-serif;
+}
