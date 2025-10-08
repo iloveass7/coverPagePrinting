@@ -1,11 +1,14 @@
+// utils/pdfGenerator.js
 const PDFDocument = require("pdfkit");
 const NodeCache = require("node-cache");
 
+// Cache for 1 hour (3600 seconds)
 const pdfCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 
 const generatePDF = (coverData) => {
   return new Promise((resolve, reject) => {
     try {
+      // Create cache key from data
       const cacheKey = JSON.stringify(coverData);
 
       // Check cache
@@ -25,118 +28,127 @@ const generatePDF = (coverData) => {
       doc.on("data", buffers.push.bind(buffers));
       doc.on("end", () => {
         const pdfBuffer = Buffer.concat(buffers);
-
+        // Cache the generated PDF
         pdfCache.set(cacheKey, pdfBuffer);
         resolve(pdfBuffer);
       });
       doc.on("error", reject);
 
-      // cover page design
+      // CUSTOMIZE YOUR COVER PAGE DESIGN HERE
+      // ====================================
+
+      // University Logo (centered at top)
+      // If you have a logo file, uncomment and use:
+      // doc.image('path/to/logo.png', 250, 50, { width: 100, align: 'center' });
+      // doc.moveDown(3);
+
+      // University Header
       doc
-        .fontSize(24)
+        .fontSize(16)
         .font("Helvetica-Bold")
-        .text("ASSIGNMENT COVER PAGE", { align: "center" })
+        .text("Ahsanullah University of Science and Technology", {
+          align: "center",
+        })
+        .moveDown(0.5);
+
+      doc
+        .fontSize(12)
+        .font("Helvetica")
+        .text(`Department of ${coverData.department}`, { align: "center" })
         .moveDown(2);
 
-      // Horizontal line
-      doc.moveTo(72, doc.y).lineTo(540, doc.y).stroke().moveDown(2);
-
-      // Student Information
-      doc.fontSize(12).font("Helvetica-Bold");
-
-      const startY = doc.y;
-      const labelX = 100;
-      const valueX = 250;
-      const lineHeight = 30;
-
-      // Name
-      doc.text("Student Name:", labelX, startY);
-      doc.font("Helvetica").text(coverData.name, valueX, startY);
-
-      // Student ID
+      // Program Details
       doc
-        .font("Helvetica-Bold")
-        .text("Student ID:", labelX, startY + lineHeight);
-      doc
+        .fontSize(11)
         .font("Helvetica")
-        .text(coverData.studentId, valueX, startY + lineHeight);
+        .text(`Program: ${coverData.program}`, { align: "center" })
+        .moveDown(0.3);
 
-      // Department
+      // Course Information (if provided)
+      if (coverData.courseNo) {
+        doc
+          .text(`Course No: ${coverData.courseNo}`, { align: "center" })
+          .moveDown(0.3);
+      }
+
+      if (coverData.courseTitle) {
+        doc
+          .text(`Course Title: ${coverData.courseTitle}`, { align: "center" })
+          .moveDown(2);
+      } else {
+        doc.moveDown(2);
+      }
+
+      // Assignment Number (Bold and centered)
       doc
+        .fontSize(12)
         .font("Helvetica-Bold")
-        .text("Department:", labelX, startY + lineHeight * 2);
+        .text(`Assignment No: ${coverData.assignmentNo}`, { align: "center" })
+        .moveDown(0.5);
+
+      // Assignment Name (if provided)
+      if (coverData.assignmentName) {
+        doc
+          .fontSize(11)
+          .font("Helvetica")
+          .text(`Assignment Name: ${coverData.assignmentName}`, {
+            align: "center",
+          })
+          .moveDown(0.5);
+      }
+
+      // Date of Submission
       doc
+        .fontSize(11)
         .font("Helvetica")
-        .text(coverData.department, valueX, startY + lineHeight * 2);
+        .text(`Date of Submission: ${coverData.submissionDate}`, {
+          align: "center",
+        })
+        .moveDown(3);
 
-      // Lab Group
+      // Submitted To Section
       doc
+        .fontSize(11)
         .font("Helvetica-Bold")
-        .text("Lab Group:", labelX, startY + lineHeight * 3);
-      doc
-        .font("Helvetica")
-        .text(coverData.labGroup, valueX, startY + lineHeight * 3);
+        .text("Submitted To:", 72, doc.y)
+        .moveDown(0.5);
 
-      doc.moveDown(6);
+      // Handle multiple teachers (array or single string/object)
+      let teachers = [];
+      if (Array.isArray(coverData.teacher)) {
+        teachers = coverData.teacher;
+      } else {
+        teachers = [coverData.teacher];
+      }
 
-      // Assignment Details Section
-      doc.moveTo(72, doc.y).lineTo(540, doc.y).stroke().moveDown(1);
+      teachers.forEach((teacher, index) => {
+        // Teacher can be string or object {name, department}
+        const teacherName =
+          typeof teacher === "string" ? teacher : teacher.name;
+        const teacherDept =
+          typeof teacher === "object" && teacher.department
+            ? teacher.department
+            : coverData.department; // Use student's department as default
 
-      doc
-        .fontSize(14)
-        .font("Helvetica-Bold")
-        .text("ASSIGNMENT DETAILS", { align: "center" })
-        .moveDown(1);
+        doc.font("Helvetica").text(teacherName, 72).moveDown(0.3);
+        doc.text(`Department of ${teacherDept}, AUST.`, 72);
 
-      doc.moveTo(72, doc.y).lineTo(540, doc.y).stroke().moveDown(2);
+        // Add extra space if not the last teacher
+        if (index < teachers.length - 1) {
+          doc.moveDown(0.5);
+        }
+      });
 
-      doc.fontSize(12);
-      const detailsY = doc.y;
+      doc.moveDown(3);
 
-      // Assignment No
-      doc.font("Helvetica-Bold").text("Assignment No:", labelX, detailsY);
-      doc.font("Helvetica").text(coverData.assignmentNo, valueX, detailsY);
+      // Submitted By Section
+      doc.font("Helvetica-Bold").text("Submitted By:", 72, doc.y).moveDown(0.5);
 
-      // Assignment Name
-      doc
-        .font("Helvetica-Bold")
-        .text("Assignment Name:", labelX, detailsY + lineHeight);
-      doc
-        .font("Helvetica")
-        .text(coverData.assignmentName, valueX, detailsY + lineHeight, {
-          width: 280,
-          align: "left",
-        });
+      doc.font("Helvetica").text(coverData.name, 72).moveDown(0.3);
 
-      // Submission Date
-      doc
-        .font("Helvetica-Bold")
-        .text("Submission Date:", labelX, detailsY + lineHeight * 2.5);
-      doc
-        .font("Helvetica")
-        .text(coverData.submissionDate, valueX, detailsY + lineHeight * 2.5);
+      doc.text(`ID: ${coverData.studentId}`, 72).moveDown(0.3);
 
-      // Teacher
-      doc
-        .font("Helvetica-Bold")
-        .text("Submitted To:", labelX, detailsY + lineHeight * 3.5);
-      doc
-        .font("Helvetica")
-        .text(coverData.teacher, valueX, detailsY + lineHeight * 3.5);
-
-      // Footer
-      doc
-        .fontSize(10)
-        .font("Helvetica-Oblique")
-        .text(
-          `Generated on ${new Date().toLocaleString("en-US", {
-            dateStyle: "long",
-            timeStyle: "short",
-          })}`,
-          72,
-          doc.page.height - 100,
-          { align: "center" }
-        );
+      doc.text(`Lab Group: ${coverData.labGroup}`, 72);
 
       doc.end();
     } catch (error) {

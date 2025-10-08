@@ -1,5 +1,7 @@
+// utils/emailService.js
 const nodemailer = require("nodemailer");
 
+// Create reusable transporter (configure with your SMTP settings)
 const createTransporter = () => {
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || "smtp.gmail.com",
@@ -53,6 +55,12 @@ const sendEmail = async (coverData, pdfBuffer, token) => {
               }</td>
             </tr>
             <tr>
+              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Program:</strong></td>
+              <td style="padding: 10px; border: 1px solid #ddd;">${
+                coverData.program
+              }</td>
+            </tr>
+            <tr style="background-color: #f9f9f9;">
               <td style="padding: 10px; border: 1px solid #ddd;"><strong>Lab Group:</strong></td>
               <td style="padding: 10px; border: 1px solid #ddd;">${
                 coverData.labGroup
@@ -62,18 +70,39 @@ const sendEmail = async (coverData, pdfBuffer, token) => {
 
           <h3 style="color: #333; margin-top: 20px;">Assignment Details:</h3>
           <table style="width: 100%; border-collapse: collapse;">
+            ${
+              coverData.courseNo
+                ? `
+            <tr style="background-color: #f9f9f9;">
+              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Course No:</strong></td>
+              <td style="padding: 10px; border: 1px solid #ddd;">${coverData.courseNo}</td>
+            </tr>`
+                : ""
+            }
+            ${
+              coverData.courseTitle
+                ? `
+            <tr>
+              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Course Title:</strong></td>
+              <td style="padding: 10px; border: 1px solid #ddd;">${coverData.courseTitle}</td>
+            </tr>`
+                : ""
+            }
             <tr style="background-color: #f9f9f9;">
               <td style="padding: 10px; border: 1px solid #ddd;"><strong>Assignment No:</strong></td>
               <td style="padding: 10px; border: 1px solid #ddd;">${
                 coverData.assignmentNo
               }</td>
             </tr>
+            ${
+              coverData.assignmentName
+                ? `
             <tr>
               <td style="padding: 10px; border: 1px solid #ddd;"><strong>Assignment Name:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${
-                coverData.assignmentName
-              }</td>
-            </tr>
+              <td style="padding: 10px; border: 1px solid #ddd;">${coverData.assignmentName}</td>
+            </tr>`
+                : ""
+            }
             <tr style="background-color: #f9f9f9;">
               <td style="padding: 10px; border: 1px solid #ddd;"><strong>Submission Date:</strong></td>
               <td style="padding: 10px; border: 1px solid #ddd;">${
@@ -81,10 +110,24 @@ const sendEmail = async (coverData, pdfBuffer, token) => {
               }</td>
             </tr>
             <tr>
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Teacher:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${
-                coverData.teacher
-              }</td>
+              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Submitted To:</strong></td>
+              <td style="padding: 10px; border: 1px solid #ddd;">
+                ${(() => {
+                  const teachers = Array.isArray(coverData.teacher)
+                    ? coverData.teacher
+                    : [coverData.teacher];
+                  return teachers
+                    .map((t) => {
+                      const teacherName = typeof t === "string" ? t : t.name;
+                      const teacherDept =
+                        typeof t === "object" && t.department
+                          ? t.department
+                          : coverData.department;
+                      return `${teacherName}<br>Department of ${teacherDept}, AUST.`;
+                    })
+                    .join("<br><br>");
+                })()}
+              </td>
             </tr>
           </table>
 

@@ -25,210 +25,149 @@ const generateDOCX = async (coverData) => {
     }
 
     // CUSTOMIZE YOUR COVER PAGE DESIGN HERE
+    // ====================================
 
     const doc = new Document({
       sections: [
         {
           properties: {},
           children: [
-            // Title
+            // University Header
             new Paragraph({
-              text: "ASSIGNMENT COVER PAGE",
+              text: "Ahsanullah University of Science and Technology",
               alignment: AlignmentType.CENTER,
-              spacing: { after: 400 },
+              spacing: { after: 100 },
               style: "Heading1",
-            }),
-
-            // Horizontal line (simulated with border)
-            new Paragraph({
-              border: {
-                bottom: {
-                  color: "000000",
-                  space: 1,
-                  style: BorderStyle.SINGLE,
-                  size: 6,
-                },
-              },
-              spacing: { after: 400 },
-            }),
-
-            // Student Name
-            new Paragraph({
-              spacing: { after: 200 },
-              children: [
-                new TextRun({
-                  text: "Student Name: ",
-                  bold: true,
-                  size: 24,
-                }),
-                new TextRun({
-                  text: coverData.name,
-                  size: 24,
-                }),
-              ],
-            }),
-
-            // Student ID
-            new Paragraph({
-              spacing: { after: 200 },
-              children: [
-                new TextRun({
-                  text: "Student ID: ",
-                  bold: true,
-                  size: 24,
-                }),
-                new TextRun({
-                  text: coverData.studentId,
-                  size: 24,
-                }),
-              ],
             }),
 
             // Department
             new Paragraph({
-              spacing: { after: 200 },
-              children: [
-                new TextRun({
-                  text: "Department: ",
-                  bold: true,
-                  size: 24,
-                }),
-                new TextRun({
-                  text: coverData.department,
-                  size: 24,
-                }),
-              ],
-            }),
-
-            // Lab Group
-            new Paragraph({
-              spacing: { after: 400 },
-              children: [
-                new TextRun({
-                  text: "Lab Group: ",
-                  bold: true,
-                  size: 24,
-                }),
-                new TextRun({
-                  text: coverData.labGroup,
-                  size: 24,
-                }),
-              ],
-            }),
-
-            // Section divider
-            new Paragraph({
-              border: {
-                top: {
-                  color: "000000",
-                  space: 1,
-                  style: BorderStyle.SINGLE,
-                  size: 6,
-                },
-                bottom: {
-                  color: "000000",
-                  space: 1,
-                  style: BorderStyle.SINGLE,
-                  size: 6,
-                },
-              },
-              spacing: { before: 200, after: 200 },
-            }),
-
-            // Assignment Details Header
-            new Paragraph({
-              text: "ASSIGNMENT DETAILS",
+              text: `Department of ${coverData.department}`,
               alignment: AlignmentType.CENTER,
-              spacing: { after: 200 },
-              style: "Heading2",
-            }),
-
-            // Section divider
-            new Paragraph({
-              border: {
-                bottom: {
-                  color: "000000",
-                  space: 1,
-                  style: BorderStyle.SINGLE,
-                  size: 6,
-                },
-              },
               spacing: { after: 400 },
             }),
 
-            // Assignment No
+            // Program
             new Paragraph({
-              spacing: { after: 200 },
-              children: [
-                new TextRun({
-                  text: "Assignment No: ",
-                  bold: true,
-                  size: 24,
-                }),
-                new TextRun({
-                  text: coverData.assignmentNo,
-                  size: 24,
-                }),
-              ],
-            }),
-
-            // Assignment Name
-            new Paragraph({
-              spacing: { after: 200 },
-              children: [
-                new TextRun({
-                  text: "Assignment Name: ",
-                  bold: true,
-                  size: 24,
-                }),
-                new TextRun({
-                  text: coverData.assignmentName,
-                  size: 24,
-                }),
-              ],
-            }),
-
-            // Submission Date
-            new Paragraph({
-              spacing: { after: 200 },
-              children: [
-                new TextRun({
-                  text: "Submission Date: ",
-                  bold: true,
-                  size: 24,
-                }),
-                new TextRun({
-                  text: coverData.submissionDate,
-                  size: 24,
-                }),
-              ],
-            }),
-
-            // Teacher
-            new Paragraph({
-              spacing: { after: 400 },
-              children: [
-                new TextRun({
-                  text: "Submitted To: ",
-                  bold: true,
-                  size: 24,
-                }),
-                new TextRun({
-                  text: coverData.teacher,
-                  size: 24,
-                }),
-              ],
-            }),
-
-            // Footer
-            new Paragraph({
-              text: `Generated on ${new Date().toLocaleString("en-US", {
-                dateStyle: "long",
-                timeStyle: "short",
-              })}`,
+              text: `Program: ${coverData.program}`,
               alignment: AlignmentType.CENTER,
-              spacing: { before: 600 },
-              italics: true,
+              spacing: { after: 100 },
+            }),
+
+            // Course No (if provided)
+            ...(coverData.courseNo
+              ? [
+                  new Paragraph({
+                    text: `Course No: ${coverData.courseNo}`,
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 100 },
+                  }),
+                ]
+              : []),
+
+            // Course Title (if provided)
+            ...(coverData.courseTitle
+              ? [
+                  new Paragraph({
+                    text: `Course Title: ${coverData.courseTitle}`,
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 400 },
+                  }),
+                ]
+              : [new Paragraph({ spacing: { after: 400 } })]),
+
+            // Assignment Number
+            new Paragraph({
+              spacing: { after: 100 },
+              alignment: AlignmentType.CENTER,
+              children: [
+                new TextRun({
+                  text: `Assignment No: ${coverData.assignmentNo}`,
+                  bold: true,
+                  size: 24,
+                }),
+              ],
+            }),
+
+            // Assignment Name (if provided)
+            ...(coverData.assignmentName
+              ? [
+                  new Paragraph({
+                    text: `Assignment Name: ${coverData.assignmentName}`,
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 100 },
+                  }),
+                ]
+              : []),
+
+            // Date of Submission
+            new Paragraph({
+              text: `Date of Submission: ${coverData.submissionDate}`,
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 600 },
+            }),
+
+            // Submitted To
+            new Paragraph({
+              spacing: { after: 100 },
+              children: [
+                new TextRun({
+                  text: "Submitted To:",
+                  bold: true,
+                  size: 24,
+                }),
+              ],
+            }),
+
+            // Handle multiple teachers
+            ...(Array.isArray(coverData.teacher)
+              ? coverData.teacher
+              : [coverData.teacher]
+            ).flatMap((teacher, index, arr) => {
+              const teacherName =
+                typeof teacher === "string" ? teacher : teacher.name;
+              const teacherDept =
+                typeof teacher === "object" && teacher.department
+                  ? teacher.department
+                  : coverData.department;
+
+              return [
+                new Paragraph({
+                  text: teacherName,
+                  spacing: { after: 100 },
+                }),
+                new Paragraph({
+                  text: `Department of ${teacherDept}, AUST.`,
+                  spacing: { after: index < arr.length - 1 ? 200 : 600 },
+                }),
+              ];
+            }),
+
+            // Submitted By
+            new Paragraph({
+              spacing: { after: 100 },
+              children: [
+                new TextRun({
+                  text: "Submitted By:",
+                  bold: true,
+                  size: 24,
+                }),
+              ],
+            }),
+
+            new Paragraph({
+              text: coverData.name,
+              spacing: { after: 100 },
+            }),
+
+            new Paragraph({
+              text: `ID: ${coverData.studentId}`,
+              spacing: { after: 100 },
+            }),
+
+            new Paragraph({
+              text: `Lab Group: ${coverData.labGroup}`,
+              spacing: { after: 200 },
             }),
           ],
         },
