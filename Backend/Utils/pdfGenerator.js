@@ -1,7 +1,7 @@
-// utils/pdfGenerator.js
 const PDFDocument = require("pdfkit");
 const NodeCache = require("node-cache");
-
+const path = require("path");
+const logo = path.join(__dirname, "../Resources/austlogo.png");
 // Cache for 1 hour (3600 seconds)
 const pdfCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 
@@ -39,8 +39,8 @@ const generatePDF = (coverData) => {
 
       // University Logo (centered at top)
       // If you have a logo file, uncomment and use:
-      // doc.image('path/to/logo.png', 250, 50, { width: 100, align: 'center' });
-      // doc.moveDown(3);
+      doc.image(logo, 250, 50, { width: 100, align: "center" });
+      doc.moveDown(3);
 
       // University Header
       doc
@@ -57,24 +57,13 @@ const generatePDF = (coverData) => {
         .text(`Department of ${coverData.department}`, { align: "center" })
         .moveDown(2);
 
-      // Program Details
-      doc
-        .fontSize(11)
-        .font("Helvetica")
-        .text(`Program: ${coverData.program}`, { align: "center" })
-        .moveDown(0.3);
-
       // Course Information (if provided)
       if (coverData.courseNo) {
-        doc
-          .text(`Course No: ${coverData.courseNo}`, { align: "center" })
-          .moveDown(0.3);
+        doc.text(`Course No: ${coverData.courseNo}`).moveDown(0.3);
       }
 
       if (coverData.courseTitle) {
-        doc
-          .text(`Course Title: ${coverData.courseTitle}`, { align: "center" })
-          .moveDown(2);
+        doc.text(`Course Title: ${coverData.courseTitle}`).moveDown(2);
       } else {
         doc.moveDown(2);
       }
@@ -83,7 +72,7 @@ const generatePDF = (coverData) => {
       doc
         .fontSize(12)
         .font("Helvetica-Bold")
-        .text(`Assignment No: ${coverData.assignmentNo}`, { align: "center" })
+        .text(`Assignment No: ${coverData.assignmentNo}`)
         .moveDown(0.5);
 
       // Assignment Name (if provided)
@@ -91,9 +80,7 @@ const generatePDF = (coverData) => {
         doc
           .fontSize(11)
           .font("Helvetica")
-          .text(`Assignment Name: ${coverData.assignmentName}`, {
-            align: "center",
-          })
+          .text(`Assignment Name: ${coverData.assignmentName}`)
           .moveDown(0.5);
       }
 
@@ -101,9 +88,7 @@ const generatePDF = (coverData) => {
       doc
         .fontSize(11)
         .font("Helvetica")
-        .text(`Date of Submission: ${coverData.submissionDate}`, {
-          align: "center",
-        })
+        .text(`Date of Submission: ${coverData.submissionDate}`)
         .moveDown(3);
 
       // Submitted To Section

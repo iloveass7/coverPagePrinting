@@ -5,10 +5,14 @@ const {
   Paragraph,
   TextRun,
   AlignmentType,
-  BorderStyle,
+  HeadingLevel,
+  ImageRun,
 } = require("docx");
 const NodeCache = require("node-cache");
+const fs = require("fs");
 
+const path = require("path");
+const logoPath = path.join(__dirname, "../Resources/austlogo.png");
 // Cache for 1 hour
 const docxCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 
@@ -27,149 +31,273 @@ const generateDOCX = async (coverData) => {
     // CUSTOMIZE YOUR COVER PAGE DESIGN HERE
     // ====================================
 
+    const children = [];
+
+    // Logo (if you have one, uncomment and provide path)
+
+    if (fs.existsSync(logoPath)) {
+      children.push(
+        new Paragraph({
+          children: [
+            new ImageRun({
+              data: fs.readFileSync(logoPath),
+              transformation: {
+                width: 150,
+                height: 170,
+              },
+            }),
+          ],
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
+        })
+      );
+    }
+
+    // University Header
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: "Ahsanullah University of Science and Technology",
+            font: "Helvetica Bold",
+            size: 32, // 16pt
+            bold: true,
+          }),
+        ],
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 100 },
+      })
+    );
+
+    // Department
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: `Department of ${coverData.department}`,
+            font: "Helvetica",
+            size: 24, // 12pt
+          }),
+        ],
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 400 },
+      })
+    );
+
+    // Course No (if provided)
+    if (coverData.courseNo) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Course No: ${coverData.courseNo}`,
+              font: "Helvetica",
+              size: 22, // 11pt
+            }),
+          ],
+          alignment: AlignmentType.LEFT,
+          spacing: { after: 60 },
+        })
+      );
+    }
+
+    // Course Title (if provided)
+    if (coverData.courseTitle) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Course Title: ${coverData.courseTitle}`,
+              font: "Helvetica",
+              size: 22, // 11pt
+            }),
+          ],
+          alignment: AlignmentType.LEFT,
+          spacing: { after: 400 },
+        })
+      );
+    } else {
+      children.push(new Paragraph({ spacing: { after: 400 } }));
+    }
+
+    // Assignment Number (Bold)
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: `Assignment No: ${coverData.assignmentNo}`,
+            font: "Helvetica",
+            size: 24, // 12pt
+            bold: true,
+          }),
+        ],
+        alignment: AlignmentType.LEFT,
+        spacing: { after: 100 },
+      })
+    );
+
+    // Assignment Name (if provided)
+    if (coverData.assignmentName) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Assignment Name: ${coverData.assignmentName}`,
+              font: "Helvetica",
+              size: 22, // 11pt
+            }),
+          ],
+          alignment: AlignmentType.LEFT,
+          spacing: { after: 100 },
+        })
+      );
+    }
+
+    // Date of Submission
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: `Date of Submission: ${coverData.submissionDate}`,
+            font: "Helvetica",
+            size: 22, // 11pt
+          }),
+        ],
+        alignment: AlignmentType.LEFT,
+        spacing: { after: 600 },
+      })
+    );
+
+    // Submitted To (Bold, Left-aligned)
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: "Submitted To:",
+            font: "Helvetica",
+            size: 22, // 11pt
+            bold: true,
+          }),
+        ],
+        spacing: { after: 100 },
+      })
+    );
+
+    // Handle multiple teachers
+    let teachers = [];
+    if (Array.isArray(coverData.teacher)) {
+      teachers = coverData.teacher;
+    } else {
+      teachers = [coverData.teacher];
+    }
+
+    teachers.forEach((teacher, index) => {
+      const teacherName = typeof teacher === "string" ? teacher : teacher.name;
+      const teacherDept =
+        typeof teacher === "object" && teacher.department
+          ? teacher.department
+          : coverData.department;
+
+      // Teacher Name
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: teacherName,
+              font: "Helvetica",
+              size: 22, // 11pt
+            }),
+          ],
+          spacing: { after: 60 },
+        })
+      );
+
+      // Teacher Department
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Department of ${teacherDept}, AUST.`,
+              font: "Helvetica",
+              size: 22, // 11pt
+            }),
+          ],
+          spacing: { after: index < teachers.length - 1 ? 100 : 600 },
+        })
+      );
+    });
+
+    // Submitted By (Bold, Left-aligned)
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: "Submitted By:",
+            font: "Helvetica",
+            size: 22, // 11pt
+            bold: true,
+          }),
+        ],
+        spacing: { after: 100 },
+      })
+    );
+
+    // Student Name
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: coverData.name,
+            font: "Helvetica",
+            size: 22, // 11pt
+          }),
+        ],
+        spacing: { after: 60 },
+      })
+    );
+
+    // Student ID
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: `ID: ${coverData.studentId}`,
+            font: "Helvetica",
+            size: 22, // 11pt
+          }),
+        ],
+        spacing: { after: 60 },
+      })
+    );
+
+    // Lab Group
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: `Lab Group: ${coverData.labGroup}`,
+            font: "Helvetica",
+            size: 22, // 11pt
+          }),
+        ],
+        spacing: { after: 200 },
+      })
+    );
+
     const doc = new Document({
       sections: [
         {
-          properties: {},
-          children: [
-            // University Header
-            new Paragraph({
-              text: "Ahsanullah University of Science and Technology",
-              alignment: AlignmentType.CENTER,
-              spacing: { after: 100 },
-              style: "Heading1",
-            }),
-
-            // Department
-            new Paragraph({
-              text: `Department of ${coverData.department}`,
-              alignment: AlignmentType.CENTER,
-              spacing: { after: 400 },
-            }),
-
-            // Program
-            new Paragraph({
-              text: `Program: ${coverData.program}`,
-              alignment: AlignmentType.CENTER,
-              spacing: { after: 100 },
-            }),
-
-            // Course No (if provided)
-            ...(coverData.courseNo
-              ? [
-                  new Paragraph({
-                    text: `Course No: ${coverData.courseNo}`,
-                    alignment: AlignmentType.CENTER,
-                    spacing: { after: 100 },
-                  }),
-                ]
-              : []),
-
-            // Course Title (if provided)
-            ...(coverData.courseTitle
-              ? [
-                  new Paragraph({
-                    text: `Course Title: ${coverData.courseTitle}`,
-                    alignment: AlignmentType.CENTER,
-                    spacing: { after: 400 },
-                  }),
-                ]
-              : [new Paragraph({ spacing: { after: 400 } })]),
-
-            // Assignment Number
-            new Paragraph({
-              spacing: { after: 100 },
-              alignment: AlignmentType.CENTER,
-              children: [
-                new TextRun({
-                  text: `Assignment No: ${coverData.assignmentNo}`,
-                  bold: true,
-                  size: 24,
-                }),
-              ],
-            }),
-
-            // Assignment Name (if provided)
-            ...(coverData.assignmentName
-              ? [
-                  new Paragraph({
-                    text: `Assignment Name: ${coverData.assignmentName}`,
-                    alignment: AlignmentType.CENTER,
-                    spacing: { after: 100 },
-                  }),
-                ]
-              : []),
-
-            // Date of Submission
-            new Paragraph({
-              text: `Date of Submission: ${coverData.submissionDate}`,
-              alignment: AlignmentType.CENTER,
-              spacing: { after: 600 },
-            }),
-
-            // Submitted To
-            new Paragraph({
-              spacing: { after: 100 },
-              children: [
-                new TextRun({
-                  text: "Submitted To:",
-                  bold: true,
-                  size: 24,
-                }),
-              ],
-            }),
-
-            // Handle multiple teachers
-            ...(Array.isArray(coverData.teacher)
-              ? coverData.teacher
-              : [coverData.teacher]
-            ).flatMap((teacher, index, arr) => {
-              const teacherName =
-                typeof teacher === "string" ? teacher : teacher.name;
-              const teacherDept =
-                typeof teacher === "object" && teacher.department
-                  ? teacher.department
-                  : coverData.department;
-
-              return [
-                new Paragraph({
-                  text: teacherName,
-                  spacing: { after: 100 },
-                }),
-                new Paragraph({
-                  text: `Department of ${teacherDept}, AUST.`,
-                  spacing: { after: index < arr.length - 1 ? 200 : 600 },
-                }),
-              ];
-            }),
-
-            // Submitted By
-            new Paragraph({
-              spacing: { after: 100 },
-              children: [
-                new TextRun({
-                  text: "Submitted By:",
-                  bold: true,
-                  size: 24,
-                }),
-              ],
-            }),
-
-            new Paragraph({
-              text: coverData.name,
-              spacing: { after: 100 },
-            }),
-
-            new Paragraph({
-              text: `ID: ${coverData.studentId}`,
-              spacing: { after: 100 },
-            }),
-
-            new Paragraph({
-              text: `Lab Group: ${coverData.labGroup}`,
-              spacing: { after: 200 },
-            }),
-          ],
+          properties: {
+            page: {
+              margin: {
+                top: 1440, // 1 inch = 1440 twips
+                right: 1440,
+                bottom: 1440,
+                left: 1440,
+              },
+            },
+          },
+          children: children,
         },
       ],
     });
