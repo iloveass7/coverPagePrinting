@@ -22,137 +22,37 @@ const sendEmail = async (coverData, pdfBuffer, token) => {
     const mailOptions = {
       from: `"Assignment Cover Generator" <${process.env.SMTP_USER}>`,
       to: process.env.PRINT_SHOP_EMAIL, // Print shop owner's email
-      subject: `🔖 PRINT REQUEST - TOKEN: ${token}`,
+      subject: `Print Request - ${token}`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">
-            New Print Request
-          </h2>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 500px; margin: 0 auto; padding: 40px 20px;">
           
-          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <h3 style="color: #4CAF50; margin-top: 0;">🔑 Search Token: <span style="background-color: #ffeb3b; padding: 5px 10px; border-radius: 3px;">${token}</span></h3>
-            <p style="color: #666; font-size: 14px;">Search your inbox with this token to find this print request quickly.</p>
+          <!-- Token -->
+          <div style="background-color: #f8f9fa; border-left: 4px solid #10b981; padding: 20px; margin-bottom: 30px;">
+            <div style="font-size: 13px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Token</div>
+            <div style="font-size: 24px; font-weight: 600; color: #111827; letter-spacing: 2px;">${token}</div>
           </div>
 
-          <h3 style="color: #333;">Student Details:</h3>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr style="background-color: #f9f9f9;">
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Name:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${
-                coverData.name
-              }</td>
-            </tr>
-            <tr>
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Student ID:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${
-                coverData.studentId
-              }</td>
-            </tr>
-            <tr style="background-color: #f9f9f9;">
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Department:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${
-                coverData.department
-              }</td>
-            </tr>
-            <tr>
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Program:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${
-                coverData.program
-              }</td>
-            </tr>
-            <tr style="background-color: #f9f9f9;">
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Lab Group:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${
-                coverData.labGroup
-              }</td>
-            </tr>
-          </table>
-
-          <h3 style="color: #333; margin-top: 20px;">Assignment Details:</h3>
-          <table style="width: 100%; border-collapse: collapse;">
-            ${
-              coverData.courseNo
-                ? `
-            <tr style="background-color: #f9f9f9;">
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Course No:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${coverData.courseNo}</td>
-            </tr>`
-                : ""
-            }
-            ${
-              coverData.courseTitle
-                ? `
-            <tr>
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Course Title:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${coverData.courseTitle}</td>
-            </tr>`
-                : ""
-            }
-            <tr style="background-color: #f9f9f9;">
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Assignment No:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${
-                coverData.assignmentNo
-              }</td>
-            </tr>
-            ${
-              coverData.assignmentName
-                ? `
-            <tr>
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Assignment Name:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${coverData.assignmentName}</td>
-            </tr>`
-                : ""
-            }
-            <tr style="background-color: #f9f9f9;">
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Submission Date:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${
-                coverData.submissionDate
-              }</td>
-            </tr>
-            <tr>
-              <td style="padding: 10px; border: 1px solid #ddd;"><strong>Submitted To:</strong></td>
-              <td style="padding: 10px; border: 1px solid #ddd;">
-                ${(() => {
-                  const teachers = Array.isArray(coverData.teacher)
-                    ? coverData.teacher
-                    : [coverData.teacher];
-                  return teachers
-                    .map((t) => {
-                      const teacherName = typeof t === "string" ? t : t.name;
-                      const teacherDept =
-                        typeof t === "object" && t.department
-                          ? t.department
-                          : coverData.department;
-                      return `${teacherName}<br>Department of ${teacherDept}, AUST.`;
-                    })
-                    .join("<br><br>");
-                })()}
-              </td>
-            </tr>
-          </table>
-
-          <div style="margin-top: 30px; padding: 15px; background-color: #e3f2fd; border-left: 4px solid #2196F3; border-radius: 3px;">
-            <p style="margin: 0; color: #1976D2;">
-              <strong>📎 Assignment cover page is attached as PDF.</strong>
-            </p>
+          <!-- Student Info -->
+          <div style="margin-bottom: 25px;">
+            <div style="font-size: 14px; color: #6b7280; margin-bottom: 5px;">Name</div>
+            <div style="font-size: 16px; color: #111827;">${coverData.name}</div>
           </div>
 
-          <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
-          
-          <p style="color: #999; font-size: 12px; text-align: center;">
-            Generated by Assignment Cover Generator on ${new Date().toLocaleString(
-              "en-US",
-              {
-                dateStyle: "long",
-                timeStyle: "short",
-              }
-            )}
-          </p>
+          <div style="margin-bottom: 30px;">
+            <div style="font-size: 14px; color: #6b7280; margin-bottom: 5px;">Student ID</div>
+            <div style="font-size: 16px; color: #111827;">${coverData.studentId}</div>
+          </div>
+
+          <!-- PDF Notice -->
+          <div style="padding: 15px; background-color: #f0fdf4; border-radius: 6px; text-align: center;">
+            <div style="font-size: 14px; color: #047857;">PDF attached</div>
+          </div>
+
         </div>
       `,
       attachments: [
         {
-          filename: `assignment_cover_${coverData.studentId}_${token}.pdf`,
+          filename: `${token}.pdf`,
           content: pdfBuffer,
           contentType: "application/pdf",
         },

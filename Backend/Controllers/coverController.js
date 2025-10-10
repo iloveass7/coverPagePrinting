@@ -19,7 +19,7 @@ const downloadPDF = async (req, res) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=assignment_cover_${coverData.studentId}.pdf`
+      `attachment; filename=Ass_${coverData.assignmentNo}_${coverData.studentId}.pdf`
     );
     res.setHeader("Content-Length", pdfBuffer.length);
 
@@ -49,7 +49,7 @@ const downloadDOCX = async (req, res) => {
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=assignment_cover_${coverData.studentId}.docx`
+      `attachment; filename=Ass_${coverData.assignmentNo}_${coverData.studentId}.docx`
     );
     res.setHeader("Content-Length", docxBuffer.length);
 
